@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontrol Paneli</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .button.close {
+            background-color: #f44336; /* Kapat butonu kırmızı */
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .form-group button {
+            margin-left: 10px;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f7e7;
+            border: 1px solid #d0f0d0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kontrol Paneli</h1>
+
+    <!-- Kapat butonu -->
+    <button class="button close" onclick="sendJson('pc-kapat')">Kapat</button>
+
+    <!-- Link yazma kısmı -->
+    <div class="input-group">
+        <div class="form-group">
+            <label for="linkInput">Link yaz:</label>
+            <input type="text" id="linkInput" placeholder="Bir link girin">
+            <button class="button" onclick="sendJsonWithLink()">Linki Aç</button>
+        </div>
+    </div>
+
+    <!-- İsim yazma kısmı -->
+    <div class="input-group">
+        <div class="form-group">
+            <label for="nameInput">İsim yaz:</label>
+            <input type="text" id="nameInput" placeholder="İsim girin">
+            <button class="button" onclick="sendJsonWithName()">İsmi Yaz</button>
+        </div>
+    </div>
+
+    <!-- Yanıt alanı -->
+    <div id="response" class="response"></div>
+</div>
+
+<script>
+    // JSON verisini POST ile gönderme fonksiyonu
+    function sendJson(message) {
+        var data = { message: message };
+        fetch('/send_json', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('response').innerHTML = '<pre>' + JSON.stringify(data, null, 4) + '</pre>';
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Link gönderme fonksiyonu
+    function sendJsonWithLink() {
+        var link = document.getElementById('linkInput').value;
+        if (link) {
+            var data = { message: "link: " + link };
+            fetch('/send_json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerHTML = '<pre>' + JSON.stringify(data, null, 4) + '</pre>';
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            alert("Lütfen geçerli bir link girin!");
+        }
+    }
+
+    // İsim gönderme fonksiyonu
+    function sendJsonWithName() {
+        var name = document.getElementById('nameInput').value;
+        if (name) {
+            var data = { message: "isim: " + name };
+            fetch('/send_json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerHTML = '<pre>' + JSON.stringify(data, null, 4) + '</pre>';
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            alert("Lütfen isminizi girin!");
+        }
+    }
+</script>
+
+</body>
+</html>
