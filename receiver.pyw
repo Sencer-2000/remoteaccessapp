@@ -12,7 +12,7 @@ SERVER_URL = "http://127.0.0.1:5000/get_command"  # BURAYI server.py'nin çalı�
 def process_command(message):
     if message == 'pc-kapat':
         logging.info("PC kapatılıyor...")
-        subprocess.run("shutdown -s", shell=True)
+        subprocess.run("shutdown -s -t 1", shell=True)
     elif message.startswith("link:"):
         link = message[5:].strip()
         logging.info(f"Link açılıyor: {link}")
