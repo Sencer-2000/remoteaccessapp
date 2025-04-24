@@ -21,6 +21,8 @@ def process_command(message):
         name = message[5:].strip()
         logging.info(f"İsim alındı: {name}")
         subprocess.run(f"konfeti.exe {name}", shell=True)
+    elif message.startswith("joke"):
+        subprocess.run("chilledwindows.exe",shell=True)
     else:
         logging.info("Yeni komut yok veya geçersiz.")
 
