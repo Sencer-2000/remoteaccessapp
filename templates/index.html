@@ -1,173 +1,136 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontrol Paneli</title>
+    <title>Remote Control Panel</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 50px auto;
+            background: #0f0f0f;
+            color: #fff;
+            font-family: Arial;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            color: #333;
+
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            border-radius: 5px;
-            margin: 10px 0;
+
+        input {
+            padding: 10px;
+            width: 300px;
+        }
+
+        button {
+            padding: 10px 15px;
             cursor: pointer;
         }
-        .button.close {
-            background-color: #f44336; /* Kapat butonu kırmızı */
+
+        .danger {
+            background: red;
+            color: white;
         }
-        .joke{
-            background-color: #4CAF50;
-        }
-        .input-group {
-            margin: 20px 0;
-        }
-        input[type="text"] {
-            width: 100%;
+
+        .card {
+            background: #1c1c1c;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .form-group {
+            margin: 5px 0;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
-            margin: 15px 0;
+            align-items: center;
         }
-        .form-group label {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .form-group button {
-            margin-left: 10px;
-        }
-        .response {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #e7f7e7;
-            border: 1px solid #d0f0d0;
-            border-radius: 5px;
-            font-size: 14px;
+
+        .kill {
+            background: crimson;
+            border: none;
+            color: white;
+            padding: 5px 10px;
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Kontrol Paneli</h1>
+<h1>🖥 Remote Control Panel</h1>
 
-    <!-- Kapat butonu -->
-    <button class="button close" onclick="sendJson('pc-kapat')">Kapat</button>
+<!-- ⛔ PC KAPAT -->
+<button class="danger" onclick="shutdownPC()">⛔ PC Kapat</button>
 
-    <!-- Şaka butonu -->
-    <button class="button joke" onclick="sendJson('joke')">Şaka Yap</button>
+<hr>
 
-    <!-- Link yazma kısmı -->
-    <div class="input-group">
-        <div class="form-group">
-            <label for="linkInput">Link yaz:</label>
-            <input type="text" id="linkInput" placeholder="Bir link girin">
-            <button class="button" onclick="sendJsonWithLink()">Linki Aç</button>
-        </div>
-    </div>
-
-    <!-- İsim yazma kısmı -->
-    <div class="input-group">
-        <div class="form-group">
-            <label for="nameInput">İsim yaz:</label>
-            <input type="text" id="nameInput" placeholder="İsim girin">
-            <button class="button" onclick="sendJsonWithName()">İsmi Yaz</button>
-        </div>
-    </div>
-
-    <!-- Yanıt alanı -->
-    <div id="response" class="response"></div>
+<!-- 🔗 LINK -->
+<div class="row">
+    <input id="link" placeholder="https://example.com">
+    <button onclick="openLink()">🔗 Aç</button>
 </div>
 
+<hr>
+
+<!-- 🧠 APPS -->
+<h3>📱 Açık Uygulamalar</h3>
+<div id="apps"></div>
+
 <script>
-    // JSON verisini POST ile gönderme fonksiyonu
-    function sendJson(message) {
-        var data = { message: message };
-        fetch('/send_json', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('response').innerHTML = '<pre>' + JSON.stringify(data, null, 4) + '</pre>';
-        })
-        .catch(error => console.error('Error:', error));
-    }
+async function loadApps() {
+    let res = await fetch("/apps");
+    let data = await res.json();
 
-    // Link gönderme fonksiyonu
-    function sendJsonWithLink() {
-        var link = document.getElementById('linkInput').value;
-        if (link) {
-            var data = { message: "link: " + link };
-            fetch('/send_json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('response').innerHTML = '<pre>' + JSON.stringify(data, null, 4) + '</pre>';
-            })
-            .catch(error => console.error('Error:', error));
-        } else {
-            alert("Lütfen geçerli bir link girin!");
-        }
-    }
+    let container = document.getElementById("apps");
+    container.innerHTML = "";
 
-    // İsim gönderme fonksiyonu
-    function sendJsonWithName() {
-        var name = document.getElementById('nameInput').value;
-        if (name) {
-            var data = { message: "isim: " + name };
-            fetch('/send_json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('response').innerHTML = '<pre>' + JSON.stringify(data, null, 4) + '</pre>';
-            })
-            .catch(error => console.error('Error:', error));
-        } else {
-            alert("Lütfen isminizi girin!");
-        }
-    }
+    data.forEach(app => {
+        let div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <span>${app.name} (PID: ${app.pid})</span>
+            <button class="kill" onclick="killApp('${app.pid}')">❌</button>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+// 🔥 app kapat
+function killApp(pid) {
+    fetch("/set_command", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            message: "kill:" + pid
+        })
+    });
+}
+
+// ⛔ PC kapat
+function shutdownPC() {
+    fetch("/set_command", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            message: "pc-kapat"
+        })
+    });
+}
+
+// 🔗 link aç
+function openLink() {
+    let link = document.getElementById("link").value;
+
+    fetch("/set_command", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            message: "link:" + link
+        })
+    });
+}
+
+// auto refresh
+setInterval(loadApps, 2000);
+loadApps();
 </script>
 
 </body>

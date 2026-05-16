@@ -1,29 +1,54 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-# En son gönderilen komutu burada tutacağız
-latest_command = {"message": None}
+latest_command = {"message": ""}
+latest_apps = []
 
-@app.route('/')
-def index():
-    return render_template('index.html')
 
-@app.route('/send_json', methods=['POST'])
-def send_json():
+# -------------------------
+# COMMAND SET
+# -------------------------
+@app.route("/set_command", methods=["POST"])
+def set_command():
     global latest_command
-    data = request.get_json()
-    latest_command = data  # Komutu saklıyoruz
-    return jsonify({"status": "success", "message": "Komut kaydedildi."})
+    latest_command["message"] = request.json.get("message", "")
+    return {"status": "ok"}
 
-# Receiver bu endpoint üzerinden komutları çekecek
-@app.route('/get_command', methods=['GET'])
+
+# -------------------------
+# COMMAND GET
+# -------------------------
+@app.route("/get_command")
 def get_command():
-    global latest_command
-    # Komut döndürülüp sıfırlanabilir
-    command = latest_command
-    latest_command = {"message": None}
-    return jsonify(command)
+    return jsonify(latest_command)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+# -------------------------
+# APPS REPORT
+# -------------------------
+@app.route("/report", methods=["POST"])
+def report():
+    global latest_apps
+    latest_apps = request.json.get("apps", [])
+    return {"status": "ok"}
+
+
+# -------------------------
+# APPS FETCH
+# -------------------------
+@app.route("/apps")
+def apps():
+    return jsonify(latest_apps)
+
+
+# -------------------------
+# PANEL
+# -------------------------
+@app.route("/")
+def panel():
+    return render_template("index.html")
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
